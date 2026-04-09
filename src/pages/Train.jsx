@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { weeklyOverview, coldProtocol, progressiveOverload } from '../data/workouts'
+import ColdTimer from '../components/ColdTimer'
 
 export default function Train() {
   const todayIdx = new Date().getDay()
   const dayMap = [6,0,1,2,3,4,5] // Sun=6, Mon=0, ...
+  const [showColdTimer, setShowColdTimer] = useState(false)
 
   return (
     <div className="page">
+      {showColdTimer && <ColdTimer onClose={() => setShowColdTimer(false)} />}
       <div className="page-header">
         <h1>Train</h1>
         <p className="subtitle">7 days/week · Bodyweight only · 30–45 min</p>
@@ -75,6 +79,11 @@ export default function Train() {
         <div className="section-title">Cold Shower Protocol</div>
         <div className="info-box success" style={{marginBottom:12}}>
           <p><strong>Post-training, every day.</strong> Dopamine +250%, NE +300%, Endorphins ↑, NPY ↑</p>
+        </div>
+        <div style={{textAlign:'center', marginBottom:12}}>
+          <button className="btn-timer btn-timer-sm" onClick={() => setShowColdTimer(true)}>
+            Start Cold Timer
+          </button>
         </div>
         <div className="card">
           {coldProtocol.map((c, i) => (

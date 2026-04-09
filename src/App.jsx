@@ -1,4 +1,5 @@
 import { Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { haptic } from './utils/haptics'
 import Today from './pages/Today'
 import Schedule from './pages/Schedule'
 import Train from './pages/Train'
@@ -9,7 +10,6 @@ import BreathworkDetail from './pages/BreathworkDetail'
 import SleepPage from './pages/SleepPage'
 import DopaminePage from './pages/DopaminePage'
 import SocialPage from './pages/SocialPage'
-import TrackingPage from './pages/TrackingPage'
 
 function TabIcon({ name }) {
   const icons = {
@@ -26,7 +26,7 @@ function BackButton({ to, label }) {
   const navigate = useNavigate()
   return (
     <div className="nav-header">
-      <button className="back-btn" onClick={() => to ? navigate(to) : navigate(-1)}>
+      <button className="back-btn" onClick={() => { haptic(10); to ? navigate(to) : navigate(-1) }}>
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
         {label || 'Back'}
       </button>
@@ -38,11 +38,10 @@ export { BackButton }
 
 export default function App() {
   const location = useLocation()
-  const isSubPage = location.pathname.split('/').length > 2
 
   return (
     <div className="app-container">
-      <div className="page-wrapper">
+      <div className="page-wrapper" key={location.key}>
         <Routes>
           <Route path="/" element={<Today />} />
           <Route path="/schedule" element={<Schedule />} />
@@ -54,24 +53,23 @@ export default function App() {
           <Route path="/library/sleep" element={<SleepPage />} />
           <Route path="/library/dopamine" element={<DopaminePage />} />
           <Route path="/library/social" element={<SocialPage />} />
-          <Route path="/library/tracking" element={<TrackingPage />} />
         </Routes>
       </div>
 
       <nav className="tab-bar">
-        <NavLink to="/" className={({isActive}) => `tab-item ${isActive ? 'active' : ''}`} end>
+        <NavLink to="/" onClick={() => haptic(10)} className={({isActive}) => `tab-item ${isActive ? 'active' : ''}`} end>
           <TabIcon name="today" /><span>Today</span>
         </NavLink>
-        <NavLink to="/schedule" className={({isActive}) => `tab-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/schedule" onClick={() => haptic(10)} className={({isActive}) => `tab-item ${isActive ? 'active' : ''}`}>
           <TabIcon name="schedule" /><span>Schedule</span>
         </NavLink>
-        <NavLink to="/train" className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/train') ? 'active' : ''}`}>
+        <NavLink to="/train" onClick={() => haptic(10)} className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/train') ? 'active' : ''}`}>
           <TabIcon name="train" /><span>Train</span>
         </NavLink>
-        <NavLink to="/nutrition" className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/nutrition') ? 'active' : ''}`}>
+        <NavLink to="/nutrition" onClick={() => haptic(10)} className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/nutrition') ? 'active' : ''}`}>
           <TabIcon name="nutrition" /><span>Nutrition</span>
         </NavLink>
-        <NavLink to="/library" className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/library') ? 'active' : ''}`}>
+        <NavLink to="/library" onClick={() => haptic(10)} className={({isActive}) => `tab-item ${isActive || location.pathname.startsWith('/library') ? 'active' : ''}`}>
           <TabIcon name="library" /><span>Library</span>
         </NavLink>
       </nav>

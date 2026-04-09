@@ -1,14 +1,27 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { techniques, meditationStyles, quickReference } from '../data/breathwork'
+import { breathTimerConfigs } from '../data/timerConfigs'
+import BreathTimer from '../components/BreathTimer'
 import { BackButton } from '../App'
 
 export default function BreathworkDetail() {
   const { id } = useParams()
   const technique = techniques.find(t => t.id === id)
+  const timerConfig = breathTimerConfigs[id]
+  const [showTimer, setShowTimer] = useState(false)
 
   return (
     <div className="page">
       <BackButton to="/library" label="Library" />
+
+      {showTimer && timerConfig && (
+        <BreathTimer
+          config={timerConfig}
+          technique={technique?.name || 'Breathwork'}
+          onClose={() => setShowTimer(false)}
+        />
+      )}
 
       {technique ? (
         <>
@@ -28,6 +41,14 @@ export default function BreathworkDetail() {
           <div className="info-box" style={{marginBottom:16}}>
             <p><strong>When to use:</strong> {technique.when}</p>
           </div>
+
+          {timerConfig && (
+            <div style={{textAlign:'center', margin:'20px 0'}}>
+              <button className="btn-timer" onClick={() => setShowTimer(true)}>
+                Start Timer
+              </button>
+            </div>
+          )}
 
           <div className="section">
             <div className="section-title" style={{fontSize:18}}>How To</div>

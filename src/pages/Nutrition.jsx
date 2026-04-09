@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import { meals, weeklyMealPlan, snacks, groceryList } from '../data/meals'
+import { meals, weeklyMealPlan, snacks, groceryList, getTodayMeals } from '../data/meals'
 import { slots, medications, introductionSchedule, warningSymptoms } from '../data/supplements'
+import PrepMode from '../components/PrepMode'
 
 function NutritionTabs() {
   const location = useLocation()
@@ -31,8 +32,15 @@ function NutritionTabs() {
 
 function MealsTab() {
   const [expanded, setExpanded] = useState(null)
+  const [showPrep, setShowPrep] = useState(false)
   return (
     <>
+      {showPrep && <PrepMode todayMeals={getTodayMeals()} allMeals={meals} onClose={() => setShowPrep(false)} />}
+      <div style={{textAlign:'center', marginBottom:16}}>
+        <button className="btn-timer btn-timer-sm" onClick={() => setShowPrep(true)}>
+          Prep Mode
+        </button>
+      </div>
       <div className="section">
         <div className="section-subtitle">4 Rotation Meals</div>
         {meals.map(meal => (

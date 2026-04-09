@@ -1,10 +1,56 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { phases, getTimeStatus, circadianAnchors, DAYS } from '../data/schedule'
+import { phases, getTimeStatus, getWeekendPhases, circadianAnchors, DAYS } from '../data/schedule'
 
 export default function Schedule() {
   const now = new Date()
   const dayName = DAYS[now.getDay()]
   const isWeekend = now.getDay() === 0 || now.getDay() === 6
+  const [, setTick] = useState(0)
+  const [weekendMode, setWeekendMode] = useState(() => localStorage.getItem('weekendMode') === 'true')
+
+  // Real-time updates every 30 seconds
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 30000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Auto-scroll to current item on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const el = document.querySelector('.timeline-item.active-now')
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Persist weekend mode
+  useEffect(() => {
+    localStorage.setItem('weekendMode', weekendMode)
+  }, [weekendMode])
+
+  const displayPhases = (isWeekend && weekendMode) ? getWeekendPhases() : phases
+
+  // Compute countdown to next item
+  const getCountdown = () => {
+    const current = now.getHours() * 60 + now.getMinutes()
+    for (const phase of displayPhases) {
+      for (const item of phase.items) {
+        const parts = item.time.split(':')
+        let h = parseInt(parts[0])
+        const m = parseInt(parts[1] || '0')
+        const t = h * 60 + m
+        if (t > current + 10) {
+          const diff = t - current
+          if (diff <= 120) return `Next in ${diff} min`
+          return null
+        }
+      }
+    }
+    return null
+  }
+
+  const countdown = getCountdown()
 
   return (
     <div className="page">
@@ -14,12 +60,23 @@ export default function Schedule() {
       </div>
 
       {isWeekend && (
-        <div className="info-box" style={{marginBottom:16}}>
-          <p><strong>Weekend Option:</strong> Training can move to morning (~7:15 AM) to free up evening for social plans. Or keep 5:10 PM for consistency.</p>
+        <div className="toggle-row">
+          <div>
+            <div className="toggle-row-label">Morning Training</div>
+            <div className="toggle-row-desc">Train at ~7:15 AM instead of 5:10 PM</div>
+          </div>
+          <button
+            className={`toggle-switch ${weekendMode ? 'active' : ''}`}
+            onClick={() => setWeekendMode(!weekendMode)}
+          />
         </div>
       )}
 
-      {phases.map(phase => (
+      {countdown && (
+        <div className="next-countdown" style={{marginBottom:12, paddingLeft:4}}>{countdown}</div>
+      )}
+
+      {displayPhases.map(phase => (
         <div key={phase.id} className="section">
           <div className="phase-header">
             <div className="phase-name">{phase.name}</div>
@@ -35,7 +92,10 @@ export default function Schedule() {
                   className={`timeline-item ${status}`}
                   style={{textDecoration:'none',color:'inherit'}}
                 >
-                  <div className="timeline-time">{formatTime(item.time)}</div>
+                  <div className="timeline-time">
+                    {formatTime(item.time)}
+                    {status === 'active-now' && <span className="now-badge">NOW</span>}
+                  </div>
                   <div className="timeline-action">{item.action}</div>
                   {item.systems.length > 0 && (
                     <div className="timeline-tags">

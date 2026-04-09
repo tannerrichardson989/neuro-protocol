@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { phases, getCurrentPhase, getTimeStatus, dayVariations, DAYS } from '../data/schedule'
 import { weeklyOverview, getTodayWorkout } from '../data/workouts'
 import { getTodayMeals, meals } from '../data/meals'
 import { slots } from '../data/supplements'
+import { useNotificationScheduler, loadNotifPrefs } from '../utils/notifications'
+import NotificationSettings from '../components/NotificationSettings'
 
 export default function Today() {
+  const [showSettings, setShowSettings] = useState(false)
+  const notifPrefs = loadNotifPrefs()
+  useNotificationScheduler(notifPrefs)
   const now = new Date()
   const dayName = DAYS[now.getDay()]
   const { phase, status, next } = getCurrentPhase()
@@ -24,10 +30,17 @@ export default function Today() {
 
   return (
     <div className="page">
-      <div className="page-header">
-        <p className="subtitle">{dayName}, {now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
-        <h1>{greeting}</h1>
+      <div className="flex-between" style={{marginBottom:4}}>
+        <div className="page-header" style={{marginBottom:0}}>
+          <p className="subtitle">{dayName}, {now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
+          <h1>{greeting}</h1>
+        </div>
+        <button className="settings-btn" onClick={() => setShowSettings(!showSettings)}>
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
+        </button>
       </div>
+
+      {showSettings && <NotificationSettings />}
 
       {/* Current Phase Hero */}
       <div className="hero-card">
@@ -138,10 +151,10 @@ export default function Today() {
             <span className="tile-title">Calm Down</span>
             <span className="tile-desc">Physiological sigh</span>
           </Link>
-          <Link to="/library/tracking" className="protocol-tile">
-            <span className="tile-icon">✅</span>
-            <span className="tile-title">Daily Check</span>
-            <span className="tile-desc">Track adherence</span>
+          <Link to="/library/dopamine" className="protocol-tile">
+            <span className="tile-icon">📱</span>
+            <span className="tile-title">Dopamine</span>
+            <span className="tile-desc">Digital hygiene</span>
           </Link>
           <Link to="/library/sleep" className="protocol-tile">
             <span className="tile-icon">🌙</span>

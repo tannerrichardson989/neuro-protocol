@@ -34,11 +34,6 @@ export default function Library() {
             <span className="tile-title">Social</span>
             <span className="tile-desc">Connection framework</span>
           </Link>
-          <Link to="/library/tracking" className="protocol-tile">
-            <span className="tile-icon">📊</span>
-            <span className="tile-title">Tracking</span>
-            <span className="tile-desc">Daily check + weekly review</span>
-          </Link>
           <Link to="/schedule" className="protocol-tile">
             <span className="tile-icon">🧠</span>
             <span className="tile-title">Schedule</span>

@@ -115,6 +115,20 @@ export function getCurrentPhase() {
   return { phase: null, status: 'Rest', next: 'Wake at 6:00 AM' };
 }
 
+export function getWeekendPhases() {
+  const clone = JSON.parse(JSON.stringify(phases))
+  const train = clone.find(p => p.id === 'train')
+  if (train) {
+    train.time = '7:15 AM – 8:15 AM'
+    const remap = { '17:00':'7:15', '17:05':'7:20', '17:10':'7:25', '17:50':'8:05', '18:00':'8:15' }
+    train.items = train.items.map(item => ({
+      ...item,
+      time: remap[item.time] || item.time
+    }))
+  }
+  return clone
+}
+
 export function getTimeStatus(timeStr) {
   const now = new Date();
   const current = now.getHours() * 60 + now.getMinutes();
